@@ -1,3 +1,29 @@
 page-home {
+    // iOS & Android only
+  .item-md, .item-ios {
+      h2 {
+          color: rgba($color: #000, $alpha: .87);
+      }
+      p {
+          color: rgba($color: #000, $alpha: .54);
+      }
+  }
+
+  // iOS, Android & WP
+  .item-md, .item-ios, .item-wp {
+      h2, p {
+          white-space: normal;
+      }
+  }
+
+  // iOS only
+  .toolbar-ios { 
+      ion-title {
+          display: none;  
+      } 
+      .searchbar-ios .searchbar-input {
+          background: rgba($color: #000, $alpha: 0.12);            
+      }
+  }
 
 }

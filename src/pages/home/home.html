@@ -1,6 +1,12 @@
 <ion-header>
-  <ion-navbar>
+  <ion-navbar color="secondary">
     <ion-title>Tutorial Ionic 2 + Angular2</ion-title>
+        <ion-searchbar 
+          [(ngModel)]="searchTerm"
+          [showCancelButton]=true
+          (ionInput)="filterItems()" 
+          placeholder="Buscar..." >
+       </ion-searchbar>
        <ion-buttons end>
           <button ion-button icon-only (click)="showFilters()">
               <ion-icon name="funnel" [style.color]="hasFilter ? 'orange' : 'inherit'"></ion-icon>
@@ -11,7 +17,7 @@
 
 <ion-content>
 
-  <ion-refresher (ionRefresh)="doRefresh($event)">
+  <ion-refresher (ionRefresh)="doRefresh($event)" [pullMin]=90>
     <ion-refresher-content 
       pullingIcon="arrow-dropdown" 
       pullingText="Pull to refresh"
@@ -26,7 +32,14 @@
         <img [src]="feed.data.thumbnail">
       </ion-thumbnail>
       <h2>{{feed.data.title}}</h2>
-      <p>{{feed.data.domain}}</p>
+       <div [ngSwitch]=feed.data.subreddit.toLowerCase()>
+          <p *ngSwitchCase="'askreddit'"><ion-icon name="help-circle"></ion-icon> {{feed.data.domain}}</p>
+          <p *ngSwitchCase="'gaming'"><ion-icon name="logo-playstation"></ion-icon> {{feed.data.domain}}</p>
+          <p *ngSwitchCase="'music'"><ion-icon name="musical-notes"></ion-icon> {{feed.data.domain}}</p>
+          <p *ngSwitchCase="'movies'"><ion-icon name="film"></ion-icon> {{feed.data.domain}}</p>
+          <p *ngSwitchCase="'pics'"><ion-icon name="image"></ion-icon> {{feed.data.domain}}</p>
+          <p *ngSwitchDefault>{{feed.data.domain}}</p>
+        </div>
     </button>
   </ion-list>
 

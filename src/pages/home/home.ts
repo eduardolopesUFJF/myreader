@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { NavController, LoadingController, ActionSheetController, Content } from 'ionic-angular';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { InAppBrowser } from "@ionic-native/in-app-browser";
+import { RedditService } from "../../providers/reddit-service/reddit-service";
 
 @Component({
   selector: 'page-home',
@@ -10,10 +11,13 @@ import { InAppBrowser } from "@ionic-native/in-app-browser";
 })
 export class HomePage {
 
+  @ViewChild(Content) content: Content;
+  
   public feeds: Array<any>;
   private url: string = "https://www.reddit.com/new.json";
   private newerPosts: string = "https://www.reddit.com/new.json?before=";
   private olderPosts: string = "https://www.reddit.com/new.json?after=";
+  private searchTerm: string = "";
   public hasFilter: boolean = false;
   public noFilter: Array<any>;
 
@@ -21,27 +25,22 @@ export class HomePage {
     public navCtrl: NavController,
     public http: Http, 
     public loadingCtrl: LoadingController,
-    public actionSheetCtrl: ActionSheetController)
+    public actionSheetCtrl: ActionSheetController,
+    public redditService: RedditService)
     {
       this.fetchContent();
   }
 
   fetchContent(): void {
+
     let loading = this.loadingCtrl.create({
       content: 'Aguarde...'
     });
-
     loading.present();
-
-    this.http.get(this.url).map(res => res.json())
-      .subscribe(data => {
-        this.feeds = data.data.children;
-        this.feeds.forEach((e, i, a) => {
-          if (!e.data.thumbnail || e.data.thumbnail.indexOf('b.thumbs.redditmedia.com') === -1) {
-            e.data.thumbnail = 'http://www.redditstatic.com/icon.png';
-          }
-        });
-        this.noFilter = this.feeds;  
+    this.redditService.fetchData(this.url).then(
+      data => {
+        this.feeds = data;
+        this.noFilter = this.feeds;
         loading.dismiss();
       });
   }
@@ -52,14 +51,9 @@ export class HomePage {
 
   doInfinite(infiniteScroll) {
     let paramsUrl = (this.feeds.length > 0) ? this.feeds[this.feeds.length - 1].data.name : "";
-    this.http.get(this.olderPosts + paramsUrl).map(res => res.json())
-      .subscribe(data => {
-        this.feeds = this.feeds.concat(data.data.children);
-        this.feeds.forEach((e, i, a) => {
-          if (!e.data.thumbnail || e.data.thumbnail.indexOf('b.thumbs.redditmedia.com') === -1) {
-            e.data.thumbnail = 'http://www.redditstatic.com/icon.png';
-          }
-        })
+    this.redditService.fetchData(this.olderPosts + paramsUrl).then(
+      data => {
+        this.feeds = this.feeds.concat(data);
         this.noFilter = this.feeds;
         this.hasFilter = false;
         infiniteScroll.complete();
@@ -68,21 +62,24 @@ export class HomePage {
 
   doRefresh(refresher) {
     let paramsUrl = this.feeds[0].data.name;
-    this.http.get(this.newerPosts + paramsUrl).map(res => res.json())
-      .subscribe(data => {
-        this.feeds = data.data.children.concat(this.feeds);
-        this.feeds.forEach((e, i, a) => {
-          if (!e.data.thumbnail || e.data.thumbnail.indexOf('b.thumbs.redditmedia.com') === -1 ) {  
-            e.data.thumbnail = 'http://www.redditstatic.com/icon.png';
-          }
-        })
+    this.redditService.fetchData(this.newerPosts + paramsUrl).then(
+      data => {
+        this.feeds = data.concat(this.feeds);
         this.noFilter = this.feeds;
         this.hasFilter = false;
         refresher.complete();
       });
   }
 
+  filterItems() {
+    this.hasFilter = false;
+    this.feeds = this.noFilter.filter((item) => {
+        return item.data.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1;
+    });
+  }
+
   showFilters() :void {
+    this.content.scrollToTop();
     let actionSheet = this.actionSheetCtrl.create({
       title: 'Filter options:',
       buttons: [
