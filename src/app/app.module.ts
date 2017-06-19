@@ -8,11 +8,13 @@ import { HttpModule } from '@angular/http';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { RedditService } from '../providers/reddit-service/reddit-service';
+import { ModalComponent } from '../components/modal/modal';
 
 @NgModule({
   declarations: [
     MyApp,
-    HomePage
+    HomePage,
+    ModalComponent
   ],
   imports: [
     BrowserModule,
@@ -22,7 +24,8 @@ import { RedditService } from '../providers/reddit-service/reddit-service';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    HomePage,
+    ModalComponent
   ],
   providers: [
     StatusBar,

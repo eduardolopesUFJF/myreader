@@ -4,6 +4,8 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { InAppBrowser } from "@ionic-native/in-app-browser";
 import { RedditService } from "../../providers/reddit-service/reddit-service";
+import { ModalController } from 'ionic-angular';
+import { ModalComponent } from "../../components/modal/modal";
 
 @Component({
   selector: 'page-home',
@@ -26,6 +28,7 @@ export class HomePage {
     public http: Http, 
     public loadingCtrl: LoadingController,
     public actionSheetCtrl: ActionSheetController,
+    public modalCtrl: ModalController,
     public redditService: RedditService)
     {
       this.fetchContent();
@@ -76,6 +79,11 @@ export class HomePage {
     this.feeds = this.noFilter.filter((item) => {
         return item.data.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1;
     });
+  }
+
+  presentModal(characterNum) {
+    let modal = this.modalCtrl.create(ModalComponent, characterNum);
+    modal.present();
   }
 
   showFilters() :void {
@@ -130,5 +138,4 @@ export class HomePage {
     });
     actionSheet.present();
   }  
-
 }

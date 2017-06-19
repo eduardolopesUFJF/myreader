@@ -27,7 +27,8 @@
   </ion-refresher>
 
   <ion-list>
-    <button ion-item *ngFor="let feed of feeds" (click)="itemSelected(feed.data.url)">
+    <!--para abrir uma url no navegador: (click)="itemSelected(feed.data.url)";-->
+    <button ion-item *ngFor="let feed of feeds" (click)="presentModal({charNum: 1})">
       <ion-thumbnail item-left>
         <img [src]="feed.data.thumbnail">
       </ion-thumbnail>
